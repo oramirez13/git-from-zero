@@ -1,6 +1,6 @@
 # Git From Zero
 
-An introductory academic guide to the Git version control system and its
+An introductory guide to the Git version control system and its
 integration with the GitHub platform. A reference document based on real-world
 cases solved during actual work sessions.
 
