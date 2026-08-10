@@ -1,4 +1,4 @@
-# Git From Zero
+# Git from zero
 
 An introductory guide to the Git version control system and its
 integration with the GitHub platform. A reference document based on real-world
