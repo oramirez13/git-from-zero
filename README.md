@@ -263,6 +263,10 @@ Explanation of each step:
 5. `git push -u origin main`
    Sends the work to the remote repository.
 
+Real terminal session from the NovaBank repository following this workflow:
+
+![Real workflow example: git status, git add, git commit and git push in the NovaBank repository](git_08.png)
+
 ## 5. Common errors and their solutions
 
 ### 5.1 Error: not a git repository
