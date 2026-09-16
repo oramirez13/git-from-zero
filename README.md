@@ -542,6 +542,52 @@ Then:
 git push
 ```
 
+### 5.13 Error: histories do not share a common ancestor
+
+Real case during a security remediation:
+
+- a repository showed `ahead 54 / behind 54` in `git status`
+- `git merge-base HEAD origin/main` returned nothing
+- `git log` on both sides had the same commit messages and the same content
+
+Cause:
+
+- the history had been rewritten with `git-filter-repo` (for example, to
+  sanitize author emails or remove files from the whole history)
+- rewriting changes every commit hash because each hash depends on the
+  author, committer, date and parents
+- the local clone still had the old history, while GitHub had the rewritten one
+- both histories contained the same files, but no commit was shared
+
+How to detect it:
+
+```bash
+git merge-base HEAD origin/main
+git diff --quiet HEAD origin/main && echo "Trees are identical"
+```
+
+How to solve it (adopt the rewritten history):
+
+1. make sure the working tree is clean (`git status`)
+2. verify that the file trees are identical (`git diff --quiet HEAD origin/main`)
+3. align the local clone with the rewritten GitHub history:
+
+```bash
+git reset --hard origin/main
+```
+
+4. verify the result:
+
+```bash
+git status
+git merge-base HEAD origin/main
+```
+
+Notes:
+
+- before resetting, save the old HEAD hash (`git rev-parse HEAD`) in case it is needed later
+- never force-push the old history over the rewritten one just to reuse the old hashes
+
 ## 6. SSH from scratch
 
 ### 6.1 Generate a new key
@@ -603,6 +649,8 @@ Host github.com
 Advantages:
 
 - simple to understand at the beginning
+- works immediately after storing a token in `~/.git-credentials`
+- reliable fallback when SSH keys are not working
 
 Disadvantages:
 
@@ -619,8 +667,24 @@ Advantages:
 Disadvantages:
 
 - the initial setup requires more work
+- can fail with `Permission denied (publickey)` when the key is not added
+  to the GitHub account, when it is registered as a deploy key instead of a
+  personal key, or when `~/.ssh/config` is not configured
 
-For frequent work with GitHub, SSH is the recommended option.
+Real case: on this machine several repositories had `git@github.com:` remotes
+that stopped working with `Permission denied (publickey)`. The practical fix
+applied was to switch those remotes to HTTPS and let the token in
+`~/.git-credentials` handle authentication:
+
+```bash
+git remote set-url origin https://github.com/USER/REPO.git
+```
+
+Conclusion from real experience:
+
+- SSH is comfortable once fully configured
+- HTTPS with a token is the most reliable option and works everywhere
+- if SSH fails, HTTPS is a quick and safe fallback
 
 ## 8. How to prepare a project for GitHub
 
@@ -765,12 +829,14 @@ By the end of this guide, the student is able to:
 
 - initialize repositories
 - connect projects with GitHub
-- use SSH correctly
+- use SSH or HTTPS with a token correctly
 - resolve authentication errors
 - understand why a `push` fails
 - integrate remote changes with `pull --rebase`
 - resolve conflicts in real files
 - prepare projects for GitHub
+- recognize and solve the case of histories that do not share a common ancestor
+  (rewritten history with `git-filter-repo`)
 
 As a next step it is recommended to write a complementary guide of common
 errors (`GIT_COMMON_ERRORS.md`) as a quick reference material.
