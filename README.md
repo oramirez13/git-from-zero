@@ -265,7 +265,7 @@ Explanation of each step:
 
 Real terminal session from the NovaBank repository following this workflow:
 
-![Real workflow example: git status, git add, git commit and git push in the NovaBank repository](git_08.png)
+![Real workflow example: git status, git add, git commit and git push in the NovaBank repository](git_01.png)
 
 ## 5. Common errors and their solutions
 
