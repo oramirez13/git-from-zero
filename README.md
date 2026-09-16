@@ -137,7 +137,7 @@ Shows the differences between the file on disk and the last saved version.
 To see the diff of a specific file:
 
 ```bash
-git diff archivo.py
+git diff file.py
 ```
 
 ### 3.7 View the configured remote
